@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LagomRealism", "LagomRealis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LagomRealismContent", "LagomRealism\LagomRealismContent\LagomRealismContent.contentproj", "{4538E2EB-1041-419C-8728-3F1A9E615619}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LagomRealismServer", "..\LagomRealismServer\LagomRealism\LagomRealismServer.csproj", "{970D456A-849A-4E56-96E6-CFE35BF10BFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LagomRealismServer", "LagomRealism\LagomRealismServer\LagomRealism\LagomRealismServer.csproj", "{970D456A-849A-4E56-96E6-CFE35BF10BFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
