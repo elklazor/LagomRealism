@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 namespace LagomRealism
 {
-    class GameClient
+    class GameClient: IFocusable
     {
         NetClient client;
         private bool worldGenerated = false;
@@ -21,6 +21,7 @@ namespace LagomRealism
         GraphicsDevice graphics;
         Point worldSize;
         private bool receivedSeed = false;
+        public Player thisPlayer;
         public GameClient(GraphicsDevice gd)
         {
             graphics = gd;
@@ -123,7 +124,8 @@ namespace LagomRealism
                 world = new World();
                 world.StringLoad(config,graphics);
                 worldGenerated = true;
-                players.Add(new Player(world.HeightMap, ID));
+                thisPlayer = new Player(world.HeightMap, ID);
+                players.Add(thisPlayer);
             }
         }
 
@@ -146,6 +148,19 @@ namespace LagomRealism
             msg.Write(ID);
             client.SendMessage(msg, NetDeliveryMethod.ReliableUnordered);
         }
-        
+
+
+        public Vector2 Position
+        {
+            get 
+            {
+                if (worldGenerated)
+                {
+                    return thisPlayer.Position;
+                }
+                else
+                    return Vector2.Zero;
+            }
+        }
     }
 }

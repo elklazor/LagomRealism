@@ -6,7 +6,7 @@ using System.Text;
 
 namespace LagomRealism
 {
-    abstract class GameComponent
+    abstract class GameComponentOBSOLETE
     {
         
         public virtual void Update()

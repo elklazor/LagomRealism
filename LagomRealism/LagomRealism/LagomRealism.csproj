@@ -81,9 +81,10 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="GameClient.cs" />
-    <Compile Include="GameComponent.cs" />
+    <Compile Include="GameComponentOBSOLETE.cs" />
     <Compile Include="GameComponentID.cs" />
     <Compile Include="GameEntity.cs" />
     <Compile Include="Player.cs" />

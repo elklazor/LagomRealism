@@ -20,12 +20,15 @@ namespace LagomRealism
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         GameClient gc;
+        Camera2D cam;
         public Game1()
         {
             
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
+            cam = new Camera2D(this);
+            
+            this.Components.Add(cam);
         }
 
         /// <summary>
@@ -37,9 +40,10 @@ namespace LagomRealism
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            cam.Initialize();
             base.Initialize();
             gc = new GameClient(this.GraphicsDevice);
+            cam.Focus = gc;
         }
 
         /// <summary>
@@ -95,7 +99,7 @@ namespace LagomRealism
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, null, null, cam.Transform);
             gc.Draw(spriteBatch);
             spriteBatch.End();
             

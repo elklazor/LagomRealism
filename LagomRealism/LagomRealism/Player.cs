@@ -8,7 +8,7 @@ using System.Text;
 
 namespace LagomRealism
 {
-    class Player:GameComponent
+    class Player:GameComponentOBSOLETE, IFocusable
     {
         private Vector2 pos;
         private Vector2 velocity = Vector2.Zero;
@@ -83,7 +83,12 @@ namespace LagomRealism
             sb.Draw(texture, pos, Color.White);
             base.Draw(sb);
         }
-        
-        
+
+
+
+        Vector2 IFocusable.Position
+        {
+            get { return Position; }
+        }
     }
 }
