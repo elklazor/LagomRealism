@@ -29,10 +29,10 @@ namespace LagomRealism
             texture = TextureManager.TextureCache["Texture"];
             heightMap = hm;
             ID = id;
-            base.Load();
+            
         }
 
-        public override void Update()
+        public void Update()
         {
             //Input
             
@@ -75,13 +75,13 @@ namespace LagomRealism
                 NeedUpdate = true;
 
             prevPos = pos;
-            base.Update();
+            
         }
 
-        public override void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb)
         {
             sb.Draw(texture, pos, Color.White);
-            base.Draw(sb);
+            
         }
 
 

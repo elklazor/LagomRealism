@@ -118,10 +118,10 @@ namespace LagomRealism
             heightMap = TerrainManager.GenerateTerrain(ref pointArr, imageSize.Y / 2,Seed,jump,maxChange);
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(worldTexture, Vector2.Zero, Color.White);
-            base.Draw(spriteBatch);
+            
         }
 
         public string WorldConfigToString()
