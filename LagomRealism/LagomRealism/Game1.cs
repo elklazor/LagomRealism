@@ -13,7 +13,7 @@ using System.Threading;
 namespace LagomRealism
 {
     /// <summary>
-    /// This is the main type for your game
+    /// This is the main type for your game YES
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
