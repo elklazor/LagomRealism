@@ -8,7 +8,7 @@ using System.Xml;
 using System.Diagnostics;
 namespace LagomRealism
 {
-    class World:GameComponentOBSOLETE
+    class World
     {
 
         private float[] heightMap;

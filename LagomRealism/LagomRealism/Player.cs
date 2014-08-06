@@ -8,7 +8,7 @@ using System.Text;
 
 namespace LagomRealism
 {
-    class Player:GameComponentOBSOLETE, IFocusable
+    class Player: IFocusable
     {
         private Vector2 pos;
         private Vector2 velocity = Vector2.Zero;
