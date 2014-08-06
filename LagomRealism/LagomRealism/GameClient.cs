@@ -13,7 +13,7 @@ namespace LagomRealism
     {
         NetClient client;
         private bool worldGenerated = false;
-        private int seed;
+        private string config;
         List<GameEntity> entities = new List<GameEntity>();
         List<Player> players = new List<Player>();
         private int ID;
@@ -28,7 +28,7 @@ namespace LagomRealism
             config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             client = new NetClient(config);
             client.Start();
-            //(players)[0] represents the local player
+            
             using (StreamReader sr = new StreamReader("./Config/Config.txt",Encoding.Default))
             {
                 string[] b = (sr.ReadToEnd()).Split(':');
@@ -61,8 +61,7 @@ namespace LagomRealism
 	                    {
                             case MessageType.WorldSeed:
                                 ID = msg.ReadInt32();
-                                seed = msg.ReadInt32();
-                                worldSize = new Point(msg.ReadInt32(), msg.ReadInt32());
+                                config = msg.ReadString();
                                 receivedSeed = true;
                                 break;
                             case MessageType.EntityUpdate:
@@ -121,8 +120,8 @@ namespace LagomRealism
             }
             else if(receivedSeed)
             { 
-                world = new World(seed);
-                world.Load(worldSize,graphics);
+                world = new World();
+                world.StringLoad(config,graphics);
                 worldGenerated = true;
                 players.Add(new Player(world.HeightMap, ID));
             }
