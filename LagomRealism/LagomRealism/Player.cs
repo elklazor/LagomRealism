@@ -26,7 +26,7 @@ namespace LagomRealism
         
         public Player(float[] hm, int id)
         {
-            texture = TextureManager.TextureCache["Texture"];
+            texture = TextureManager.TextureCache["Texture"]; 
             heightMap = hm;
             ID = id;
             
