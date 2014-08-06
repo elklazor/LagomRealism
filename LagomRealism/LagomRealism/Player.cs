@@ -8,7 +8,7 @@ using System.Text;
 
 namespace LagomRealism
 {
-    class Player:GameComponentOBSOLETE, IFocusable
+    class Player: IFocusable
     {
         private Vector2 pos;
         private Vector2 velocity = Vector2.Zero;
@@ -26,13 +26,13 @@ namespace LagomRealism
         
         public Player(float[] hm, int id)
         {
-            texture = TextureManager.TextureCache["Texture"];
+            texture = TextureManager.TextureCache["Texture"]; 
             heightMap = hm;
             ID = id;
-            base.Load();
+            
         }
 
-        public override void Update()
+        public void Update()
         {
             //Input
             
@@ -75,13 +75,13 @@ namespace LagomRealism
                 NeedUpdate = true;
 
             prevPos = pos;
-            base.Update();
+            
         }
 
-        public override void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb)
         {
             sb.Draw(texture, pos, Color.White);
-            base.Draw(sb);
+            
         }
 
 
