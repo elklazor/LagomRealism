@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="Enteties\Tree.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="GameComponentID.cs" />
     <Compile Include="GameEntity.cs" />

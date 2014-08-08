@@ -90,7 +90,7 @@ namespace LagomRealism
             Thread.Sleep(1000);
             base.OnExiting(sender, args);
         }
-
+        
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>

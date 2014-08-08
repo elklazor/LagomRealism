@@ -61,7 +61,7 @@ namespace LagomRealism
             {
                 canJump = true;   
             }
-            float locX = Position.X + texture.Width / 2;
+            float locX = Position.X + (texture.Width);
             Vector2 vec = new Vector2(locX, pos.Y + texture.Height);
             if (vec.Y >= heightMap[(int)Math.Floor(pos.X)])
             {
