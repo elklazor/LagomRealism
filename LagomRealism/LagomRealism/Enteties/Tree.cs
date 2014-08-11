@@ -9,10 +9,10 @@ namespace LagomRealism.Enteties
 {
     class Tree:GameEntity
     {
-        public Tree(EntityType type, int Id, Vector2 Position,string textureName = "Tree")
-           : base(type,textureName,Id,Position)
-        {        
-            
+        public Tree(int Id, Vector2 Position,string textureName = "Tree")
+           : base(textureName,Id,Position)
+        {
+            base.Type = EntityType.Tree;
         }
         public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
@@ -23,7 +23,7 @@ namespace LagomRealism.Enteties
         {
             if(base.State != EntityState.Broken)
             {
-                sb.Draw(base.texture, new Vector2(base.Position.X + base.texture.Width / 2, base.Position.Y + base.texture.Height), Color.White);
+                sb.Draw(base.texture, new Vector2(base.Position.X - base.texture.Width / 2, base.Position.Y - base.texture.Height + 3), Color.White);
             }
             
         }

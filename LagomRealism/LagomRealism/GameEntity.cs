@@ -24,6 +24,7 @@ namespace LagomRealism
         internal EntityType Type
         {
             get { return type; }
+            set { type = value; }
         }
                 
         private EntityState state;
@@ -33,10 +34,10 @@ namespace LagomRealism
             get { return state; }
             set { state = value; }
         }
-        public virtual GameEntity(EntityType entityType, string textureName, int Id,Vector2 position)
+        public GameEntity(string textureName, int Id,Vector2 position)
         {
             Position = position;
-            type = entityType;
+            
             texture = TextureManager.TextureCache[textureName];
             ID = Id;
             CollisionRectangle = new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height);
@@ -49,7 +50,7 @@ namespace LagomRealism
 
         public virtual void Draw(SpriteBatch sb)
         {
-            sb.Draw(texture, Position, Color.White);
+            sb.Draw(texture, new Vector2(Position.X - texture.Width / 2,Position.Y - texture.Height / 2), Color.White);
         }
 
         public virtual void Hit()

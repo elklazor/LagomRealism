@@ -22,7 +22,7 @@ namespace LagomRealism
 
     enum EntityType
     {
-        Tree = 1, Rock  
+        Generic = 0,Tree, Rock  
     }
 
     enum EntityState

@@ -18,6 +18,8 @@ namespace LagomRealism
         public int ID;
         public bool NeedUpdate = false;
         private Vector2 prevPos = Vector2.Zero;
+        private SpriteEffects effect = SpriteEffects.None;
+        private Rectangle collisionRectangle;
         public Vector2 Position
         {
             get { return pos; }

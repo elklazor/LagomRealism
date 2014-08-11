@@ -7,6 +7,7 @@ using Lidgren.Network;
 using Lidgren.Network.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using LagomRealism.Enteties;
 namespace LagomRealism
 {
     class GameClient: IFocusable
@@ -66,28 +67,50 @@ namespace LagomRealism
                                 receivedSeed = true;
                                 break;
                             case MessageType.EntityUpdate:
-                                entities.First(v1 => v1.ID == msg.ReadInt32()).State = (EntityState)msg.ReadInt32();
-                                
+                                bool fullEntity = msg.ReadBoolean();
+                                if (fullEntity)
+                                {
+
+                                    int id = msg.ReadInt32();
+                                    int type = msg.ReadInt32();
+                                    int x = msg.ReadInt32();
+                                    float y = msg.ReadFloat();
+                                    switch ((EntityType)type)
+                                    {
+                                        case EntityType.Tree:
+                                            entities.Add(new Tree(id,new Vector2(x,y)));
+                                            break;
+                                        case EntityType.Rock:
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    int id = msg.ReadInt32();
+                                    entities.First(b => b.ID == id).State = (EntityState)msg.ReadInt32();
+                                }
                                 break;
                             case MessageType.ClientPosition:
-                                int id = msg.ReadInt32();
+                                int Id = msg.ReadInt32();
                                 Vector2 vec = msg.ReadVector2();
                                 bool connected = msg.ReadBoolean();
                                 if (worldGenerated)
                                 {
                                     if (!connected)
                                     {
-                                        players.Remove(players.First(var => var.ID == id));
+                                        players.Remove(players.First(var => var.ID == Id));
                                         break;
                                     }
                                     try
                                     {
                                         
-                                        players.First(a => a.ID == id).Position = vec;
+                                        players.First(a => a.ID == Id).Position = vec;
                                     }
                                     catch (Exception)
                                     {
-                                        players.Add(new Player(world.HeightMap, id));
+                                        players.Add(new Player(world.HeightMap, Id));
                                     }
                                     
                                 }
@@ -137,7 +160,12 @@ namespace LagomRealism
                 foreach (Player player in players)
                 {
                     player.Draw(SB);
-                } 
+                }
+
+                foreach (GameEntity ent in entities)
+                {
+                    ent.Draw(SB);
+                }
             }
         }
 
