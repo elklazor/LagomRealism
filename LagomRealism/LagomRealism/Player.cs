@@ -20,6 +20,7 @@ namespace LagomRealism
         private Vector2 prevPos = Vector2.Zero;
         private SpriteEffects effect = SpriteEffects.None;
         private Rectangle collisionRectangle;
+        
         public Vector2 Position
         {
             get { return pos; }
@@ -46,10 +47,12 @@ namespace LagomRealism
 
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
+                effect = SpriteEffects.FlipHorizontally;
                 velocity.X = -0.5f;
             }
             else if (Keyboard.GetState().IsKeyDown(Keys.D))
             {
+                effect = SpriteEffects.None;
                 velocity.X = 0.5f;
             }
             else
@@ -77,12 +80,15 @@ namespace LagomRealism
                 NeedUpdate = true;
 
             prevPos = pos;
-            
+            collisionRectangle = new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height);
         }
 
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(texture, pos, Color.White);
+            
+            //sb.Draw(texture,collisionRectangle,null,Color.White,0f,Vector2.Zero,effect,0f);
+            sb.Draw(texture, Position, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
+            //sb.Draw(texture, Position, Color.White);
             
         }
 

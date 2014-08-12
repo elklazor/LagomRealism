@@ -8,6 +8,7 @@ using Lidgren.Network.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using LagomRealism.Enteties;
+using System.Windows.Forms;
 namespace LagomRealism
 {
     class GameClient: IFocusable
@@ -34,10 +35,8 @@ namespace LagomRealism
             using (StreamReader sr = new StreamReader("./Config/Config.txt",Encoding.Default))
             {
                 string[] b = (sr.ReadToEnd()).Split(':');
-                while (client.ConnectionsCount == 0)
-                {
-                    client.Connect(b[0], 14242);
-                }
+                
+                client.Connect(b[0], 14242);
                 
             }
             
