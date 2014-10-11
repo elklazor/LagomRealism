@@ -44,7 +44,7 @@ namespace LagomRealism
         
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             
             NetIncomingMessage msg;
@@ -80,6 +80,7 @@ namespace LagomRealism
                                             entities.Add(new Tree(id,new Vector2(x,y)));
                                             break;
                                         case EntityType.Rock:
+                                            entities.Add(new Rock(id, new Vector2(x, y)));
                                             break;
                                         default:
                                             break;
@@ -130,7 +131,7 @@ namespace LagomRealism
             //If the world isn't generated, generate it and dont do any update logic
             if (worldGenerated)
             {
-                players[0].Update();
+                players[0].Update(gameTime);
                 if (players[0].NeedUpdate)
                 {
                     NetOutgoingMessage message = client.CreateMessage();
@@ -156,14 +157,14 @@ namespace LagomRealism
             if (worldGenerated)
             {
                 world.Draw(SB);
-                foreach (Player player in players)
-                {
-                    player.Draw(SB);
-                }
-
+                
                 foreach (GameEntity ent in entities)
                 {
                     ent.Draw(SB);
+                }
+                foreach (Player player in players)
+                {
+                    player.Draw(SB);
                 }
             }
         }

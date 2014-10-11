@@ -20,6 +20,15 @@ namespace LagomRealism
         private Vector2 prevPos = Vector2.Zero;
         private SpriteEffects effect = SpriteEffects.None;
         private Rectangle collisionRectangle;
+        private AnimationState animState;
+        private float frameTime = 150;
+        private float frameTimer = 0;
+
+        internal AnimationState AnimState
+        {
+            get { return animState; }
+            private set { animState = value; }
+        }
         
         public Vector2 Position
         {
@@ -32,18 +41,16 @@ namespace LagomRealism
             texture = TextureManager.TextureCache["Texture"]; 
             heightMap = hm;
             ID = id;
-            
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             //Input
-            
 
-            if (velocity.Y > 0.5f)
-                velocity.Y -= velocity.Y / 6;
-            if (velocity.Y < 0.2f)
-                velocity.Y = 0f;
+            if (velocity.Y < 0.5f)
+                velocity.Y += velocity.Y / 1.5f;
+            //if (velocity.Y < 0.2f)
+             //   velocity.Y = 0f;
 
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
@@ -59,7 +66,7 @@ namespace LagomRealism
                 velocity.X = 0;
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && canJump)
             {
-                velocity.Y += -10f;
+                velocity.Y += -20f;
                 canJump = false;
             }
             if (Keyboard.GetState().IsKeyUp(Keys.Space))
@@ -68,9 +75,9 @@ namespace LagomRealism
             }
             float locX = Position.X + (texture.Width);
             Vector2 vec = new Vector2(locX, pos.Y + texture.Height);
-            if (vec.Y >= heightMap[(int)Math.Floor(pos.X)])
+            if (vec.Y >= heightMap[(int)Math.Floor(pos.X)]+5)
             {
-                pos.Y = heightMap[(int)Math.Floor(pos.X)] - texture.Height;
+                pos.Y = heightMap[(int)Math.Floor(pos.X)] - texture.Height + 5;
             }
             else
                 velocity.Y = 0.5f;
@@ -79,15 +86,32 @@ namespace LagomRealism
             if (pos != prevPos)
                 NeedUpdate = true;
 
+            if (velocity.X != 0)
+                Animate(gameTime);
+            else
+                animState = AnimationState.None;
+
             prevPos = pos;
             collisionRectangle = new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height);
         }
 
+        private void Animate(GameTime gT)
+        { 
+           if((frameTimer += gT.ElapsedGameTime.Milliseconds) >= frameTime)
+           {
+               animState++;
+               if ((int)animState > 4)
+                   animState = (AnimationState)1;
+
+               frameTimer = 0f;
+           }
+        }
+
         public void Draw(SpriteBatch sb)
         {
-            
+            Rectangle src = new Rectangle(5 * ((int)animState), 0, 5, 10);
             //sb.Draw(texture,collisionRectangle,null,Color.White,0f,Vector2.Zero,effect,0f);
-            sb.Draw(texture, Position, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
+            sb.Draw(texture, Position, src, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
             //sb.Draw(texture, Position, Color.White);
             
         }

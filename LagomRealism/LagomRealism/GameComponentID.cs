@@ -29,6 +29,10 @@ namespace LagomRealism
     {
         Fine = 1,Broken
     }
+    enum AnimationState
+    { 
+        None = 0,One,Two,Three,Four
+    }
     public static class TextureContent
     {
         public static Dictionary<string, T> LoadListContent<T>(this ContentManager contentManager, string contentFolder)
