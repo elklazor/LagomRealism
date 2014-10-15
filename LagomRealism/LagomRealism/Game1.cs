@@ -44,6 +44,7 @@ namespace LagomRealism
             base.Initialize();
             gc = new GameClient(this.GraphicsDevice);
             cam.Focus = gc;
+            gc.Load(this.Content);
         }
 
         /// <summary>
@@ -56,6 +57,7 @@ namespace LagomRealism
             spriteBatch = new SpriteBatch(GraphicsDevice);
             //Load all textures
             TextureManager.Load(this.Content);
+            
             // TODO: use this.Content to load your game content here
         }
 

@@ -12,6 +12,12 @@ namespace LagomRealism
     {
         private Vector2 pos;
         private Vector2 velocity = Vector2.Zero;
+
+        public Vector2 Velocity
+        {
+            get { return velocity; }
+            set { velocity = value; }
+        }
         public float[] heightMap;
         private bool canJump = true;
         private Texture2D texture;
@@ -19,6 +25,12 @@ namespace LagomRealism
         public bool NeedUpdate = false;
         private Vector2 prevPos = Vector2.Zero;
         private SpriteEffects effect = SpriteEffects.None;
+
+        public SpriteEffects Effect
+        {
+            get { return effect; }
+            set { effect = value; }
+        }
         private Rectangle collisionRectangle;
         private AnimationState animState;
         private float frameTime = 150;
@@ -27,7 +39,7 @@ namespace LagomRealism
         internal AnimationState AnimState
         {
             get { return animState; }
-            private set { animState = value; }
+            set { animState = value; }
         }
         
         public Vector2 Position
@@ -46,11 +58,7 @@ namespace LagomRealism
         public void Update(GameTime gameTime)
         {
             //Input
-
-            if (velocity.Y < 0.5f)
-                velocity.Y += velocity.Y / 1.5f;
-            //if (velocity.Y < 0.2f)
-             //   velocity.Y = 0f;
+            velocity.Y += 0.7f;
 
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
@@ -66,30 +74,35 @@ namespace LagomRealism
                 velocity.X = 0;
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && canJump)
             {
-                velocity.Y += -20f;
+                velocity.Y += -10f;
                 canJump = false;
             }
             if (Keyboard.GetState().IsKeyUp(Keys.Space))
             {
                 canJump = true;   
             }
+            
+           
+            pos += velocity;
             float locX = Position.X + (texture.Width);
             Vector2 vec = new Vector2(locX, pos.Y + texture.Height);
+
             if (vec.Y >= heightMap[(int)Math.Floor(pos.X)]+5)
             {
                 pos.Y = heightMap[(int)Math.Floor(pos.X)] - texture.Height + 5;
+                velocity.Y = 0;
             }
-            else
-                velocity.Y = 0.5f;
 
-            pos += velocity;
             if (pos != prevPos)
                 NeedUpdate = true;
 
             if (velocity.X != 0)
                 Animate(gameTime);
             else
+            {
                 animState = AnimationState.None;
+                NeedUpdate = true;
+            } 
 
             prevPos = pos;
             collisionRectangle = new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height);

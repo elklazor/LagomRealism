@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using LagomRealism.Enteties;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework.Content;
 namespace LagomRealism
 {
     class GameClient: IFocusable
@@ -24,6 +25,8 @@ namespace LagomRealism
         Point worldSize;
         private bool receivedSeed = false;
         public Player thisPlayer;
+        SpriteFont sf;
+
         public GameClient(GraphicsDevice gd)
         {
             graphics = gd;
@@ -96,6 +99,8 @@ namespace LagomRealism
                                 int Id = msg.ReadInt32();
                                 Vector2 vec = msg.ReadVector2();
                                 bool connected = msg.ReadBoolean();
+                                AnimationState aS = (AnimationState)msg.ReadInt32();
+                                bool flip = msg.ReadBoolean();
                                 if (worldGenerated)
                                 {
                                     if (!connected)
@@ -105,8 +110,10 @@ namespace LagomRealism
                                     }
                                     try
                                     {
-                                        
-                                        players.First(a => a.ID == Id).Position = vec;
+                                        Player p = players.First(a => a.ID == Id);
+                                        p.Position = vec;
+                                        p.AnimState = aS;
+                                        p.Effect = (flip) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
                                     }
                                     catch (Exception)
                                     {
@@ -135,9 +142,11 @@ namespace LagomRealism
                 if (players[0].NeedUpdate)
                 {
                     NetOutgoingMessage message = client.CreateMessage();
-                    message.Write((int)MessageType.ClientPosition);
-                    message.Write(ID);
-                    message.Write(players[0].Position);
+                    message.Write((int)MessageType.ClientPosition); 
+                    message.Write(ID);                                            //Player ID
+                    message.Write(players[0].Position);                           //Position
+                    message.Write((int)players[0].AnimState);                     //Animation state
+                    message.Write((players[0].Effect == SpriteEffects.None));     //Texture flip?
                     client.SendMessage(message, NetDeliveryMethod.Unreliable);
                     players[0].NeedUpdate = false;
                 }
@@ -151,7 +160,7 @@ namespace LagomRealism
                 players.Add(thisPlayer);
             }
         }
-
+        
         public void Draw(SpriteBatch SB)
         {
             if (worldGenerated)
@@ -166,9 +175,14 @@ namespace LagomRealism
                 {
                     player.Draw(SB);
                 }
+                //SB.DrawString(sf, players[0].Velocity.Y.ToString("f3"), players[0].Position, Color.Tomato);
             }
         }
-
+        public void Load(ContentManager content)
+        {
+            sf = content.Load<SpriteFont>("sFont");
+        
+        }
         public void Close()
         {
             NetOutgoingMessage msg = client.CreateMessage();
