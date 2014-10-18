@@ -18,6 +18,13 @@ namespace LagomRealism
             get { return velocity; }
             set { velocity = value; }
         }
+        private bool attacking;
+
+        public bool Attacking
+        {
+            get { return attacking; }
+            set { attacking = value; }
+        }
         public float[] heightMap;
         private bool canJump = true;
         private Texture2D texture;
@@ -59,7 +66,7 @@ namespace LagomRealism
         {
             //Input
             velocity.Y += 0.7f;
-
+            
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
                 effect = SpriteEffects.FlipHorizontally;
@@ -82,7 +89,6 @@ namespace LagomRealism
                 canJump = true;   
             }
             
-           
             pos += velocity;
             float locX = Position.X + (texture.Width);
             Vector2 vec = new Vector2(locX, pos.Y + texture.Height);
@@ -118,6 +124,11 @@ namespace LagomRealism
 
                frameTimer = 0f;
            }
+        }
+
+        private void Attack(GameTime gT)
+        { 
+            
         }
 
         public void Draw(SpriteBatch sb)

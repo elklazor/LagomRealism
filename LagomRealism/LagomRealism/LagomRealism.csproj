@@ -95,6 +95,8 @@
     <Compile Include="Game1.cs" />
     <Compile Include="TerrainManager.cs" />
     <Compile Include="TextureManager.cs" />
+    <Compile Include="Weapons\IWeapon.cs" />
+    <Compile Include="Weapons\Sword.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>
