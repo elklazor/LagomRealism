@@ -107,6 +107,9 @@
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </Content>
+    <Content Include="References\Lidgren.Network.dll" />
+    <Content Include="References\Lidgren.Network.Xna.dll" />
+    <Content Include="References\Microsoft.Xna.Framework.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LagomRealismContent\LagomRealismContent.contentproj">

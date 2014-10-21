@@ -14,9 +14,9 @@ namespace LagomRealism.Weapons
         private Vector2 origin;
         private Rectangle? wepRectangle;
         private bool flip;
-        private int damage;
+        private float damage;
 
-        public int Damage
+        public float Damage
         {
             get { return damage; }
             set { damage = value; }
@@ -50,10 +50,17 @@ namespace LagomRealism.Weapons
             set { texture = value; }
         }
 
+        public Sword()
+        {
+            texture = TextureManager.TextureCache["Sword"];
+            position = new Vector2(20, 140);
+        }
+
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(texture, new Rectangle((int)position.X,((int)position.Y,texture.Width,texture.Height), wepRectangle,
+            sb.Draw(texture, new Rectangle((int)position.X,((int)position.Y),texture.Width,texture.Height), null/*wepRectangle*/,
                 Color.White, rotation, origin, (flip) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
         }
+
     }
 }

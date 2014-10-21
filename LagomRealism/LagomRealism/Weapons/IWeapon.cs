@@ -9,21 +9,21 @@ namespace LagomRealism.Weapons
 {
     interface IWeapon
     {
-        public Vector2 Position
+        Vector2 Position
         { get; set; }
 
-        public float Rotation
+        float Rotation
         { get; set; }
 
-        public void Draw(SpriteBatch sb);
+        void Draw(SpriteBatch sb);
 
-        public Texture2D Texture
+        Texture2D Texture
         { get; set; }
 
-        public Vector2 Origin
+        Vector2 Origin
         { get; set; }
 
-        public float Damage
+        float Damage
         { get; set; }
     }
 }

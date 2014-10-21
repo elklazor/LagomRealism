@@ -105,8 +105,15 @@ namespace LagomRealism
                                 {
                                     if (!connected)
                                     {
-                                        players.Remove(players.First(var => var.ID == Id));
-                                        break;
+                                        try
+                                        {
+                                            players.Remove(players.First(var => var.ID == Id));
+                                        }
+                                        catch (Exception)
+                                        { 
+                                        
+                                        }
+                                            break;
                                     }
                                     try
                                     {

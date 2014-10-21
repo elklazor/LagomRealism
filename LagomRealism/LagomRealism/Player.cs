@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using LagomRealism.Weapons;
 namespace LagomRealism
 {
     class Player: IFocusable
@@ -25,7 +25,7 @@ namespace LagomRealism
         public bool NeedUpdate = false;
         private Vector2 prevPos = Vector2.Zero;
         private SpriteEffects effect = SpriteEffects.None;
-
+        private IWeapon playerWeapon = new Sword();
         public SpriteEffects Effect
         {
             get { return effect; }
@@ -81,7 +81,8 @@ namespace LagomRealism
             {
                 canJump = true;   
             }
-            
+            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
+                playerWeapon.Rotation += 0.05f;
            
             pos += velocity;
             float locX = Position.X + (texture.Width);
@@ -125,6 +126,9 @@ namespace LagomRealism
             Rectangle src = new Rectangle(5 * ((int)animState), 0, 5, 10);
             //sb.Draw(texture,collisionRectangle,null,Color.White,0f,Vector2.Zero,effect,0f);
             sb.Draw(texture, Position, src, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
+            playerWeapon.Position = Position;
+            
+            playerWeapon.Draw(sb);
             //sb.Draw(texture, Position, Color.White);
             
         }
