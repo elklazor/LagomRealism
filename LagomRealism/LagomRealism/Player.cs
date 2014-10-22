@@ -128,7 +128,7 @@ namespace LagomRealism
             sb.Draw(texture, Position, src, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
             playerWeapon.Position = Position;
             
-            playerWeapon.Draw(sb);
+             playerWeapon.Draw(sb);
             //sb.Draw(texture, Position, Color.White);
             
         }
