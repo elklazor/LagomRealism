@@ -54,6 +54,7 @@ namespace LagomRealism.Weapons
         {
             texture = TextureManager.TextureCache["Sword"];
             position = new Vector2(20, 140);
+            origin = new Vector2(0,5);
         }
 
         public void Draw(SpriteBatch sb)

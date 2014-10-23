@@ -31,7 +31,7 @@ namespace LagomRealism
     }
     enum AnimationState
     { 
-        None = 0,One,Two,Three,Four
+         One = 0,Two,Three,Four
     }
     public static class TextureContent
     {

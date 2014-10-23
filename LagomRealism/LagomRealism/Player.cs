@@ -19,11 +19,13 @@ namespace LagomRealism
             set { velocity = value; }
         }
         public float[] heightMap;
-        private bool canJump = true;
+        public bool canJump = true;
+        private bool idle;
         private Texture2D texture;
         public int ID;
         public bool NeedUpdate = false;
         private Vector2 prevPos = Vector2.Zero;
+        private Vector2 handPos = new Vector2(19, 19);
         private SpriteEffects effect = SpriteEffects.None;
         private IWeapon playerWeapon = new Sword();
         public SpriteEffects Effect
@@ -33,7 +35,7 @@ namespace LagomRealism
         }
         private Rectangle collisionRectangle;
         private AnimationState animState;
-        private float frameTime = 150;
+        private float frameTime = 300;
         private float frameTimer = 0;
 
         internal AnimationState AnimState
@@ -50,7 +52,7 @@ namespace LagomRealism
         
         public Player(float[] hm, int id)
         {
-            texture = TextureManager.TextureCache["Texture"]; 
+            texture = TextureManager.TextureCache["Knight"]; 
             heightMap = hm;
             ID = id;
         }
@@ -59,7 +61,7 @@ namespace LagomRealism
         {
             //Input
             velocity.Y += 0.7f;
-
+            idle = false;
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
                 effect = SpriteEffects.FlipHorizontally;
@@ -79,31 +81,32 @@ namespace LagomRealism
             }
             if (Keyboard.GetState().IsKeyUp(Keys.Space))
             {
-                canJump = true;   
+                canJump = true;
             }
             if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
                 playerWeapon.Rotation += 0.05f;
-           
-            pos += velocity;
-            float locX = Position.X + (texture.Width);
-            Vector2 vec = new Vector2(locX, pos.Y + texture.Height);
 
-            if (vec.Y >= heightMap[(int)Math.Floor(pos.X)]+5)
+            pos += velocity;
+            
+            Vector2 vec = new Vector2(pos.X, pos.Y + (texture.Height / 2));
+
+            if (vec.Y >= heightMap[(int)Math.Floor(pos.X)] + 5)
             {
-                pos.Y = heightMap[(int)Math.Floor(pos.X)] - texture.Height + 5;
+                pos.Y = heightMap[(int)Math.Floor(pos.X)] - (texture.Height / 2) +5;
                 velocity.Y = 0;
             }
+            if (velocity.X == 0f)
+                idle = true;
 
-            if (pos != prevPos)
-                NeedUpdate = true;
-
-            if (velocity.X != 0)
-                Animate(gameTime);
-            else
+            if (pos != prevPos || !idle)
             {
-                animState = AnimationState.None;
                 NeedUpdate = true;
-            } 
+                frameTime = 300f;
+            }
+            else
+                frameTime = 500f;
+
+            Animate(gameTime);
 
             prevPos = pos;
             collisionRectangle = new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height);
@@ -114,8 +117,8 @@ namespace LagomRealism
            if((frameTimer += gT.ElapsedGameTime.Milliseconds) >= frameTime)
            {
                animState++;
-               if ((int)animState > 4)
-                   animState = (AnimationState)1;
+               if ((int)animState > 3)
+                   animState = (AnimationState)0;
 
                frameTimer = 0f;
            }
@@ -123,10 +126,10 @@ namespace LagomRealism
 
         public void Draw(SpriteBatch sb)
         {
-            Rectangle src = new Rectangle(5 * ((int)animState), 0, 5, 10);
+            Rectangle src = new Rectangle(21 * ((int)animState), (idle)? 34 : 0 , 21, 34);
             //sb.Draw(texture,collisionRectangle,null,Color.White,0f,Vector2.Zero,effect,0f);
             sb.Draw(texture, Position, src, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
-            playerWeapon.Position = Position;
+            playerWeapon.Position = Position + handPos;
             
              playerWeapon.Draw(sb);
             //sb.Draw(texture, Position, Color.White);

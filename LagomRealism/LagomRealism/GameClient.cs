@@ -182,7 +182,7 @@ namespace LagomRealism
                 {
                     player.Draw(SB);
                 }
-                //SB.DrawString(sf, players[0].Velocity.Y.ToString("f3"), players[0].Position, Color.Tomato);
+               // SB.DrawString(sf, players[0].canJump.ToString(), players[0].Position, Color.Tomato);
             }
         }
         public void Load(ContentManager content)
