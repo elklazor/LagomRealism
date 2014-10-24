@@ -101,7 +101,7 @@ namespace LagomRealism
             if (pos != prevPos || !idle)
             {
                 NeedUpdate = true;
-                frameTime = 300f;
+                frameTime = 1000f;
             }
             else
                 frameTime = 500f;
@@ -109,7 +109,13 @@ namespace LagomRealism
             Animate(gameTime);
 
             prevPos = pos;
+            bool flip = effect == SpriteEffects.FlipHorizontally;
             collisionRectangle = new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height);
+            playerWeapon.Position = (flip) ? new Vector2(Position.X - texture.Width / 5,Position.Y + handPos.Y) : Position + handPos ;
+            //playerWeapon.Position = Position + handPos;
+            playerWeapon.Flip = (flip) ? true : false;
+            
+               
         }
 
         private void Animate(GameTime gT)
@@ -128,10 +134,8 @@ namespace LagomRealism
         {
             Rectangle src = new Rectangle(21 * ((int)animState), (idle)? 34 : 0 , 21, 34);
             //sb.Draw(texture,collisionRectangle,null,Color.White,0f,Vector2.Zero,effect,0f);
-            sb.Draw(texture, Position, src, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
-            playerWeapon.Position = Position + handPos;
-            
-             playerWeapon.Draw(sb);
+            sb.Draw(texture, Position, src, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);            
+            playerWeapon.Draw(sb);
             //sb.Draw(texture, Position, Color.White);
             
         }

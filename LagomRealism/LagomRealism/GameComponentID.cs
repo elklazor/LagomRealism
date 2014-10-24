@@ -42,7 +42,7 @@ namespace LagomRealism
                 throw new DirectoryNotFoundException();
             Dictionary<String, T> result = new Dictionary<String, T>();
 
-            FileInfo[] files = dir.GetFiles("*.*");
+            FileInfo[] files = dir.GetFiles("*.png*");
             foreach (FileInfo file in files)
             {
                 string key = Path.GetFileNameWithoutExtension(file.Name);

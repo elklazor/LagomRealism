@@ -25,5 +25,7 @@ namespace LagomRealism.Weapons
 
         float Damage
         { get; set; }
+        bool Flip
+        { get; set; }
     }
 }
