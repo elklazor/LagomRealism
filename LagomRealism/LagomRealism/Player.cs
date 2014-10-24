@@ -25,7 +25,7 @@ namespace LagomRealism
         public int ID;
         public bool NeedUpdate = false;
         private Vector2 prevPos = Vector2.Zero;
-        private Vector2 handPos = new Vector2(19, 19);
+        private Vector2 handPos = new Vector2(19, 20);
         private SpriteEffects effect = SpriteEffects.None;
         private IWeapon playerWeapon = new Sword();
         public SpriteEffects Effect
@@ -60,7 +60,7 @@ namespace LagomRealism
         public void Update(GameTime gameTime)
         {
             //Input
-            velocity.Y += 0.7f;
+            velocity.Y += 0.3f;
             idle = false;
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
@@ -74,9 +74,12 @@ namespace LagomRealism
             }
             else
                 velocity.X = 0;
+            
+            bool flip = effect == SpriteEffects.FlipHorizontally;
+
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && canJump)
             {
-                velocity.Y += -10f;
+                velocity.Y += -5f;
                 canJump = false;
             }
             if (Keyboard.GetState().IsKeyUp(Keys.Space))
@@ -109,9 +112,9 @@ namespace LagomRealism
             Animate(gameTime);
 
             prevPos = pos;
-            bool flip = effect == SpriteEffects.FlipHorizontally;
+            
             collisionRectangle = new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height);
-            playerWeapon.Position = (flip) ? new Vector2(Position.X - texture.Width / 5,Position.Y + handPos.Y) : Position + handPos ;
+            playerWeapon.Position = (flip) ? new Vector2(Position.X + 3,Position.Y + handPos.Y) : Position + handPos ;
             //playerWeapon.Position = Position + handPos;
             playerWeapon.Flip = (flip) ? true : false;
             

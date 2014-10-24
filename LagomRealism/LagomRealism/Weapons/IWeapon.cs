@@ -27,5 +27,7 @@ namespace LagomRealism.Weapons
         { get; set; }
         bool Flip
         { get; set; }
+        string Name
+        { get; set; }
     }
 }
