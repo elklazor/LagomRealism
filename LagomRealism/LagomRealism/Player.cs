@@ -125,7 +125,7 @@ namespace LagomRealism
                 if (pos != prevPos || !idle || prevWeaponRotation != playerWeapon.Rotation)
                 {
                     NeedUpdate = true;
-                    frameTime = 1000f;
+                    frameTime = 700f;
                 }
                 else
                     frameTime = 500f;
