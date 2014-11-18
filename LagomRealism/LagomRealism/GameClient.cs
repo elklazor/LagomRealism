@@ -101,6 +101,9 @@ namespace LagomRealism
                                 bool connected = msg.ReadBoolean();
                                 AnimationState aS = (AnimationState)msg.ReadInt32();
                                 bool flip = msg.ReadBoolean();
+                                Vector2 wepPos = msg.ReadVector2();
+                                float wepRot = msg.ReadFloat();
+                                bool isIdle = msg.ReadBoolean();
                                 if (worldGenerated)
                                 {
                                     if (!connected)
@@ -120,6 +123,9 @@ namespace LagomRealism
                                         Player p = players.First(a => a.ID == Id);
                                         p.Position = vec;
                                         p.AnimState = aS;
+                                        p.Weapon.Rotation = wepRot;
+                                        p.Weapon.Position = wepPos;
+                                        p.IsIdle = isIdle;
                                         p.Effect = (flip) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
                                     }
                                     catch (Exception)
@@ -145,7 +151,11 @@ namespace LagomRealism
             //If the world isn't generated, generate it and dont do any update logic
             if (worldGenerated)
             {
-                players[0].Update(gameTime);
+                //players[0].Update(gameTime);
+                foreach (Player player in players)
+                {
+                    player.Update(gameTime);
+                }
                 if (players[0].NeedUpdate)
                 {
                     NetOutgoingMessage message = client.CreateMessage();
@@ -154,7 +164,10 @@ namespace LagomRealism
                     message.Write(players[0].Position);                           //Position
                     message.Write((int)players[0].AnimState);                     //Animation state
                     message.Write((players[0].Effect == SpriteEffects.None));     //Texture flip?
-                    client.SendMessage(message, NetDeliveryMethod.Unreliable);
+                    message.Write(players[0].Weapon.Position);                    //Weaponposition
+                    message.Write(players[0].Weapon.Rotation);
+                    message.Write(players[0].IsIdle);                             //Weaponrotation
+                    client.SendMessage(message, NetDeliveryMethod.Unreliable);    //Send unri
                     players[0].NeedUpdate = false;
                 }
             }
@@ -164,6 +177,7 @@ namespace LagomRealism
                 world.StringLoad(config,graphics);
                 worldGenerated = true;
                 thisPlayer = new Player(world.HeightMap, ID);
+                thisPlayer.IsLocal = true;
                 players.Add(thisPlayer);
             }
         }
@@ -182,7 +196,7 @@ namespace LagomRealism
                 {
                     player.Draw(SB);
                 }
-               // SB.DrawString(sf, players[0].canJump.ToString(), players[0].Position, Color.Tomato);
+               
             }
         }
         public void Load(ContentManager content)

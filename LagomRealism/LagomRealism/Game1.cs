@@ -21,6 +21,7 @@ namespace LagomRealism
         SpriteBatch spriteBatch;
         GameClient gc;
         Camera2D cam;
+        SpriteFont sf;
         public Game1()
         {
             
@@ -56,6 +57,7 @@ namespace LagomRealism
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             //Load all textures
+            
             TextureManager.Load(this.Content);
             
             // TODO: use this.Content to load your game content here
@@ -104,7 +106,7 @@ namespace LagomRealism
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, null, null, cam.Transform);
             gc.Draw(spriteBatch);
             spriteBatch.End();
-            
+            //SB.DrawString(, /*Insert*/ , new Vector2(300,200), Color.Tomato);
             base.Draw(gameTime);
         }
     }
