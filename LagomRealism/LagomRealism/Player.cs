@@ -8,7 +8,7 @@ using System.Text;
 using LagomRealism.Weapons;
 namespace LagomRealism
 {
-    class Player: IFocusable
+    class Player: IFocusable, IGameObject
     {
         private Vector2 pos;
         private Vector2 velocity = Vector2.Zero;
@@ -32,6 +32,8 @@ namespace LagomRealism
         private float prevWeaponRotation = 0;
         public bool IsLocal = false;
         private bool idleSynced = false;
+        private bool punching;
+
         public bool IsIdle
         {
             get { return idle; }
@@ -47,6 +49,7 @@ namespace LagomRealism
             get { return effect; }
             set { effect = value; }
         }
+
         private Rectangle collisionRectangle;
         private AnimationState animState;
         private float frameTime = 300;
@@ -69,6 +72,7 @@ namespace LagomRealism
             texture = TextureManager.TextureCache["Knight"]; 
             heightMap = hm;
             ID = id;
+            playerWeapon.Rotation = 5f;
         }
 
         public void Update(GameTime gameTime)
@@ -92,7 +96,10 @@ namespace LagomRealism
                 else
                     velocity.X = 0;
 
-
+                if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !punching)
+                {
+                    punching = true;
+                }
 
                 if (Keyboard.GetState().IsKeyDown(Keys.Space) && canJump)
                 {
@@ -103,9 +110,7 @@ namespace LagomRealism
                 {
                     canJump = true;
                 }
-                if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
-                    playerWeapon.Rotation += 0.05f;
-
+                
                 pos += velocity;
 
                 Vector2 vec = new Vector2(pos.X, pos.Y + (texture.Height / 2));
@@ -135,7 +140,18 @@ namespace LagomRealism
                     NeedUpdate = true;
                     idleSynced = true;
                 }
-                
+
+                if (punching)
+                {
+                    playerWeapon.Rotation += 0.1f;
+                    if (playerWeapon.Rotation > 11.4f)
+                    {
+                        playerWeapon.Rotation = 5f;
+                        punching = false;
+                        return;
+                    }
+                    
+                }
 
                 Animate(gameTime);
 
@@ -177,11 +193,15 @@ namespace LagomRealism
             
         }
 
-
-
         Vector2 IFocusable.Position
         {
             get { return Position; }
         }
+
+        public void Hit()
+        {
+            throw new NotImplementedException();
+        }
     }
+    
 }

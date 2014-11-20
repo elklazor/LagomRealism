@@ -7,7 +7,7 @@ using System.Text;
 
 namespace LagomRealism
 {
-    abstract class GameEntity
+    abstract class GameEntity: IGameObject
     {
         private int id;
         protected Texture2D texture;
@@ -45,7 +45,7 @@ namespace LagomRealism
 
         public virtual void Update(GameTime gameTime)
         { 
-        
+            
         }
 
         public virtual void Draw(SpriteBatch sb)
@@ -54,8 +54,7 @@ namespace LagomRealism
         }
 
         public virtual void Hit()
-        { 
-            //Is called by player
+        {
             numHits++;
         }
     }
