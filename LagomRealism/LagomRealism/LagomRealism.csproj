@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="ChatManager.cs" />
     <Compile Include="Enteties\Rock.cs" />
     <Compile Include="Enteties\Tree.cs" />
     <Compile Include="GameClient.cs" />
