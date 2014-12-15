@@ -6,63 +6,79 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Xml;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 namespace LagomRealism
 {
-    class World
+    static class World
     {
 
-        private float[] heightMap;
-        private GraphicsDevice Gd;
-        private Texture2D worldTexture;
-        private int seed;
-        private int jump;
-        private int maxChange;
-        public int MaxChange
+        static private float[] heightMap;
+        static private GraphicsDevice Gd;
+        static private Texture2D worldTexture;
+        static private int seed;
+        static private int jump;
+        static private int maxChange;
+        static public ObservableCollection<GameEntity> Entities = new ObservableCollection<GameEntity>();
+        static public ObservableCollection<Player> Players = new ObservableCollection<Player>();
+        static public List<IGameObject> AllWorldEntities = new List<IGameObject>();
+        
+        
+        public static int MaxChange
         {
             get { return maxChange; }
             set { maxChange = value; }
         }
-        
 
-        public int Jump
+        public static int Jump
         {
             get { return jump; }
             set { jump = value; }
         }
-        public int Seed
+        public static int Seed
         {
             get { return seed; }
             set { seed = value; }
         }
 
-
-        public Texture2D WorldTexture
+        public static Texture2D WorldTexture
         {
             get { return worldTexture; }
             set { worldTexture = value; }
         }
-        private Point[] pointArr;
-        private Point imageSize;
 
-        public float[] HeightMap
+        private static  Point[] pointArr;
+        private static Point imageSize;
+
+        public static float[] HeightMap
         {
             get { return heightMap; }
             set { heightMap = value; }
         }
 
-        public World(int seed)
+        static World()
+        {
+            Players.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(players_CollectionChanged);
+            Entities.CollectionChanged += players_CollectionChanged;
+        }
+
+        static void players_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            AllWorldEntities.Clear();
+            AllWorldEntities.AddRange(Entities);
+            AllWorldEntities.AddRange(Players);
+        }
+        public static void SetSeed(int seed)
         {
             Seed = seed;
         }
-        public World()
+        public static void SetSeed()
         {
             Random rnd = new Random();
             Seed = rnd.Next(100, 90000);
         }
-
-        public void Load(Point imageSize,GraphicsDevice gd)
+        public static void Load(Point imgSize,GraphicsDevice gd)
         {
-            this.imageSize = imageSize;
+            imageSize = imgSize;
             Gd = gd;
             Generate();
         }
@@ -70,7 +86,7 @@ namespace LagomRealism
         /// Loads world with config file
         /// </summary>
         /// <param name="configName">Name of config file without extension</param>
-        public void Load(string configName)
+        public static void Load(string configName)
         {
             Console.WriteLine("Loading config...");
             XmlDocument xDoc = new XmlDocument();
@@ -85,7 +101,7 @@ namespace LagomRealism
             Console.WriteLine(@"\******************/");
             ServerGenerate();
         }
-        public void StringLoad(string config,GraphicsDevice gd)
+        public static void StringLoad(string config,GraphicsDevice gd)
         {
             Gd = gd;
             string[] conf = config.Split('|');
@@ -98,13 +114,13 @@ namespace LagomRealism
             Generate();
 
         }
-        public void Load(int x, int y)
+        public static void Load(int x, int y)
         {
-            this.imageSize = new Point(x, y);
+            imageSize = new Point(x, y);
             ServerGenerate();
         }
 
-        private void Generate()
+        private static void Generate()
         {
             // Array size: (screen width / jump) + 3
             pointArr = new Point[(imageSize.X / jump) +3];
@@ -112,19 +128,19 @@ namespace LagomRealism
             worldTexture = TerrainManager.PolygonToTexture(Gd, pointArr, imageSize);
         }
 
-        private void ServerGenerate()
+        private static void ServerGenerate()
         {
             pointArr = new Point[imageSize.X];
             heightMap = TerrainManager.GenerateTerrain(ref pointArr, imageSize.Y / 2,Seed,jump,maxChange);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public static void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(worldTexture, Vector2.Zero, Color.White);
             
         }
 
-        public string WorldConfigToString()
+        public static string WorldConfigToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(imageSize.X + ":" + imageSize.Y);

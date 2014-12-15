@@ -17,10 +17,9 @@ namespace LagomRealism
         NetClient client;
         private bool worldGenerated = false;
         private string config;
-        List<GameEntity> entities = new List<GameEntity>();
-        List<Player> players = new List<Player>();
+      
+        
         private int ID;
-        World world;
         GraphicsDevice graphics;
         Point worldSize;
         private bool receivedSeed = false;
@@ -72,7 +71,6 @@ namespace LagomRealism
                                 bool fullEntity = msg.ReadBoolean();
                                 if (fullEntity)
                                 {
-
                                     int id = msg.ReadInt32();
                                     int type = msg.ReadInt32();
                                     int x = msg.ReadInt32();
@@ -80,10 +78,10 @@ namespace LagomRealism
                                     switch ((EntityType)type)
                                     {
                                         case EntityType.Tree:
-                                            entities.Add(new Tree(id,new Vector2(x,y)));
+                                            World.Entities.Add(new Tree(id,new Vector2(x,y)));
                                             break;
                                         case EntityType.Rock:
-                                            entities.Add(new Rock(id, new Vector2(x, y)));
+                                            World.Entities.Add(new Rock(id, new Vector2(x, y)));
                                             break;
                                         default:
                                             break;
@@ -92,7 +90,13 @@ namespace LagomRealism
                                 else
                                 {
                                     int id = msg.ReadInt32();
-                                    entities.First(b => b.ID == id).State = (EntityState)msg.ReadInt32();
+                                    int state = msg.ReadInt32();
+                                    try
+                                    {
+                                        World.Entities.First(b => b.ID == id).State = state;
+                                    }
+                                    catch (Exception)
+                                    { }
                                 }
                                 break;
                             case MessageType.ClientPosition:
@@ -104,13 +108,14 @@ namespace LagomRealism
                                 Vector2 wepPos = msg.ReadVector2();
                                 float wepRot = msg.ReadFloat();
                                 bool isIdle = msg.ReadBoolean();
+
                                 if (worldGenerated)
                                 {
                                     if (!connected)
                                     {
                                         try
                                         {
-                                            players.Remove(players.First(var => var.ID == Id));
+                                            World.Players.Remove(World.Players.First(var => var.ID == Id));
                                         }
                                         catch (Exception)
                                         { 
@@ -120,7 +125,7 @@ namespace LagomRealism
                                     }
                                     try
                                     {
-                                        Player p = players.First(a => a.ID == Id);
+                                        Player p = World.Players.First(a => a.ID == Id);
                                         p.Position = vec;
                                         p.AnimState = aS;
                                         p.Weapon.Rotation = wepRot;
@@ -130,7 +135,7 @@ namespace LagomRealism
                                     }
                                     catch (Exception)
                                     {
-                                        players.Add(new Player(world.HeightMap, Id));
+                                        World.Players.Add(new Player(Id));
                                     }
                                     
                                 }
@@ -152,33 +157,43 @@ namespace LagomRealism
             if (worldGenerated)
             {
                 //players[0].Update(gameTime);
-                foreach (Player player in players)
+                foreach (Player player in World.Players)
                 {
                     player.Update(gameTime);
                 }
-                if (players[0].NeedUpdate)
+                if (World.Players[0].NeedUpdate)
                 {
                     NetOutgoingMessage message = client.CreateMessage();
                     message.Write((int)MessageType.ClientPosition); 
                     message.Write(ID);                                            //Player ID
-                    message.Write(players[0].Position);                           //Position
-                    message.Write((int)players[0].AnimState);                     //Animation state
-                    message.Write((players[0].Effect == SpriteEffects.None));     //Texture flip?
-                    message.Write(players[0].Weapon.Position);                    //Weaponposition
-                    message.Write(players[0].Weapon.Rotation);
-                    message.Write(players[0].IsIdle);                             //Weaponrotation
-                    client.SendMessage(message, NetDeliveryMethod.Unreliable);    //Send unri
-                    players[0].NeedUpdate = false;
+                    message.Write(World.Players[0].Position);                           //Position
+                    message.Write((int)World.Players[0].AnimState);                     //Animation state
+                    message.Write((World.Players[0].Effect == SpriteEffects.None));     //Texture flip?
+                    message.Write(World.Players[0].Weapon.Position);                    //Weaponposition
+                    message.Write(World.Players[0].Weapon.Rotation);                    //Weaponrotation
+                    message.Write(World.Players[0].IsIdle);                             //Is player idle?
+                    client.SendMessage(message, NetDeliveryMethod.Unreliable);    //Send unreliable
+                    World.Entities[0].NeedUpdate = false;
+
+                    foreach (var locEnt in World.Entities.Where(le => le.NeedUpdate = true))
+                    {
+                        NetOutgoingMessage entityMessage = client.CreateMessage();
+                        entityMessage.Write((int)MessageType.EntityUpdate);
+                        entityMessage.Write(locEnt.ID);
+                        entityMessage.Write(locEnt.State);
+                        client.SendMessage(entityMessage, NetDeliveryMethod.Unreliable);
+                        locEnt.NeedUpdate = false;
+                    }
                 }
             }
             else if(receivedSeed)
             { 
-                world = new World();
-                world.StringLoad(config,graphics);
+                
+                World.StringLoad(config,graphics);
                 worldGenerated = true;
-                thisPlayer = new Player(world.HeightMap, ID);
+                thisPlayer = new Player(ID);
                 thisPlayer.IsLocal = true;
-                players.Add(thisPlayer);
+                World.Players.Add(thisPlayer);
             }
         }
         
@@ -186,17 +201,12 @@ namespace LagomRealism
         {
             if (worldGenerated)
             {
-                world.Draw(SB);
+                World.Draw(SB);
                 
-                foreach (GameEntity ent in entities)
+                foreach (IGameObject ent in World.AllWorldEntities)
                 {
                     ent.Draw(SB);
                 }
-                foreach (Player player in players)
-                {
-                    player.Draw(SB);
-                }
-               
             }
         }
         public void Load(ContentManager content)

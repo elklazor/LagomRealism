@@ -14,6 +14,11 @@ namespace LagomRealism
         public Vector2 Position { get; set; }
         protected int numHits = 0;
         public Rectangle CollisionRectangle;
+        public bool NeedUpdate { get; set; }
+        public virtual Rectangle HitBox
+        {
+            get { return new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height); }
+        }
         public int ID
         {
             get { return id; }
@@ -27,12 +32,20 @@ namespace LagomRealism
             set { type = value; }
         }
                 
-        private EntityState state;
+        private int state;
 
-        internal EntityState State
+        internal int State
         {
             get { return state; }
-            set { state = value; }
+            set 
+            {
+                if (state != value)
+                {
+                    state = value;
+                    NeedUpdate = true;
+                } 
+            
+            }
         }
         public GameEntity(string textureName, int Id,Vector2 position)
         {
@@ -50,12 +63,15 @@ namespace LagomRealism
 
         public virtual void Draw(SpriteBatch sb)
         {
-            sb.Draw(texture, new Vector2(Position.X - texture.Width / 2,Position.Y - texture.Height / 2), Color.White);
+            //sb.Draw(texture, new Vector2(Position.X - texture.Width / 2,Position.Y - texture.Height / 2), Color.White);
+            sb.DrawString(TextureManager.StandardGameFont, numHits.ToString(), Position, Color.Yellow);
         }
 
         public virtual void Hit()
         {
             numHits++;
         }
+
+        
     }
 }

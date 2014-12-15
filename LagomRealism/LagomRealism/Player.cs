@@ -18,7 +18,6 @@ namespace LagomRealism
             get { return velocity; }
             set { velocity = value; }
         }
-        public float[] heightMap;
         public bool canJump = true;
         private bool idle;
         
@@ -33,6 +32,14 @@ namespace LagomRealism
         public bool IsLocal = false;
         private bool idleSynced = false;
         private bool punching;
+        private bool hasHitEntity = false;
+
+        private Rectangle weaponBox;
+
+        public Rectangle HitBox
+        {
+            get { return new Rectangle((int)Position.X, (int)Position.Y, 22, 32); }
+        }
 
         public bool IsIdle
         {
@@ -67,10 +74,9 @@ namespace LagomRealism
             set { pos = value; }
         }
         
-        public Player(float[] hm, int id)
+        public Player(int id)
         {
             texture = TextureManager.TextureCache["Knight"]; 
-            heightMap = hm;
             ID = id;
             playerWeapon.Rotation = 5f;
         }
@@ -116,9 +122,9 @@ namespace LagomRealism
                 Vector2 vec = new Vector2(pos.X, pos.Y + (texture.Height / 2));
 
 
-                if (vec.Y >= heightMap[(int)Math.Floor(pos.X)] + 5)
+                if (vec.Y >= World.HeightMap[(int)Math.Floor(pos.X)] + 5)
                 {
-                    pos.Y = heightMap[(int)Math.Floor(pos.X)] - (texture.Height / 2) + 5;
+                    pos.Y = World.HeightMap[(int)Math.Floor(pos.X)] - (texture.Height / 2) + 5;
                     velocity.Y = 0;
                 }
                 if (velocity.X == 0f)
@@ -148,9 +154,11 @@ namespace LagomRealism
                     {
                         playerWeapon.Rotation = 5f;
                         punching = false;
+                        hasHitEntity = false;
                         return;
                     }
-                    
+                    if (!hasHitEntity) 
+                        HitDetection();
                 }
 
                 Animate(gameTime);
@@ -198,10 +206,24 @@ namespace LagomRealism
             get { return Position; }
         }
 
+        private void HitDetection()
+        {
+            Rectangle weaponBox = new Rectangle((int)playerWeapon.Position.X,(int)playerWeapon.Position.Y,playerWeapon.Texture.Height,playerWeapon.Texture.Height);
+            foreach (var entity in World.AllWorldEntities )
+            {
+                if(weaponBox.Intersects(entity.HitBox))
+                {
+                    entity.Hit();
+                }
+            }
+            hasHitEntity = true;
+        }
+
         public void Hit()
         {
-            throw new NotImplementedException();
+      
         }
+
     }
     
 }
