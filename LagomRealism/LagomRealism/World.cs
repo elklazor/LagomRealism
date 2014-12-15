@@ -22,7 +22,6 @@ namespace LagomRealism
         static public ObservableCollection<Player> Players = new ObservableCollection<Player>();
         static public List<IGameObject> AllWorldEntities = new List<IGameObject>();
         
-        
         public static int MaxChange
         {
             get { return maxChange; }
