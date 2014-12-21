@@ -209,7 +209,7 @@ namespace LagomRealism
         private void HitDetection()
         {
             Rectangle weaponBox = new Rectangle((int)playerWeapon.Position.X,(int)playerWeapon.Position.Y,playerWeapon.Texture.Height,playerWeapon.Texture.Height);
-            foreach (var entity in World.AllWorldEntities )
+            foreach (var entity in World.Entities )
             {
                 if(weaponBox.Intersects(entity.HitBox))
                 {

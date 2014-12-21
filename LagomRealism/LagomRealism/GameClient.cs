@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 namespace LagomRealism
 {
-    class GameClient: IFocusable
+    class GameClient: IFocusable, IDisposable
     {
         NetClient client;
         private bool worldGenerated = false;
@@ -166,23 +166,24 @@ namespace LagomRealism
                 {
                     player.Update(gameTime);
                 }
-                if (World.Players[0].NeedUpdate)
+                if (thisPlayer.NeedUpdate)
                 {
                     NetOutgoingMessage message = client.CreateMessage();
                     message.Write((int)MessageType.ClientPosition); 
                     message.Write(ID);                                            //Player ID
-                    message.Write(World.Players[0].Position);                           //Position
-                    message.Write((int)World.Players[0].AnimState);                     //Animation state
-                    message.Write((World.Players[0].Effect == SpriteEffects.None));     //Texture flip?
-                    message.Write(World.Players[0].Weapon.Position);                    //Weaponposition
-                    message.Write(World.Players[0].Weapon.Rotation);                    //Weaponrotation
-                    message.Write(World.Players[0].IsIdle);                             //Is player idle?
+                    message.Write(thisPlayer.Position);                           //Position
+                    message.Write((int)thisPlayer.AnimState);                     //Animation state
+                    message.Write((thisPlayer.Effect == SpriteEffects.None));     //Texture flip?
+                    message.Write(thisPlayer.Weapon.Position);                    //Weaponposition
+                    message.Write(thisPlayer.Weapon.Rotation);                    //Weaponrotation
+                    message.Write(thisPlayer.IsIdle);                             //Is player idle?
                     client.SendMessage(message, NetDeliveryMethod.Unreliable);    //Send unreliable
-                    World.Entities[0].NeedUpdate = false;
+                    thisPlayer.NeedUpdate = false;
 
-                    
                 }
-                foreach (var locEnt in World.Entities.Where(le => le.NeedUpdate == true))
+               
+                List<GameEntity> entitiesNeedUpdate = World.Entities.Where(le => le.NeedUpdate).ToList();
+                foreach (var locEnt in entitiesNeedUpdate)
                 {
                     NetOutgoingMessage entityMessage = client.CreateMessage();
                     entityMessage.Write((int)MessageType.EntityUpdate);
@@ -276,6 +277,11 @@ namespace LagomRealism
                                             rectangleToDraw.Y + rectangleToDraw.Height - thicknessOfBorder,
                                             rectangleToDraw.Width,
                                             thicknessOfBorder), borderColor);
+        }
+
+        public void Dispose()
+        {
+            BorderTexture.Dispose();
         }
     }
 }

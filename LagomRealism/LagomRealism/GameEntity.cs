@@ -57,7 +57,7 @@ namespace LagomRealism
         public virtual void Draw(SpriteBatch sb)
         {
             //sb.Draw(texture, new Vector2(Position.X - texture.Width / 2,Position.Y - texture.Height / 2), Color.White);
-            sb.DrawString(TextureManager.StandardGameFont, numHits.ToString(), Position, Color.Yellow);
+            sb.DrawString(TextureManager.StandardGameFont, ID.ToString(), Position, Color.Yellow);
         }
 
         public virtual void Hit()

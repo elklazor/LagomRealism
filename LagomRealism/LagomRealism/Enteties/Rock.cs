@@ -39,8 +39,10 @@ namespace LagomRealism.Enteties
             if (++base.numHits >= 3)
             {
                 base.State = 1;
+                
                 base.Hit();
             }
+            base.NeedUpdate = true;
         }
     }
 }

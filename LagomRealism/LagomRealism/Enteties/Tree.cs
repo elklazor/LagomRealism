@@ -33,8 +33,7 @@ namespace LagomRealism.Enteties
             {
                 sb.Draw(base.texture, new Vector2(base.Position.X - base.texture.Width / 2, base.Position.Y - base.texture.Height + 3), Color.White);
                 base.Draw(sb);
-            }
-            
+            }        
         }
         public override void Hit()
         {
@@ -42,8 +41,8 @@ namespace LagomRealism.Enteties
             if (++base.numHits >= 3)
             {
                 base.State = 1;
-                base.Hit();
             }
+            base.NeedUpdate = true;
         }
     }
 }
