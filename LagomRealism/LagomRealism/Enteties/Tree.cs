@@ -14,6 +14,14 @@ namespace LagomRealism.Enteties
         {
             base.Type = EntityType.Tree;
         }
+
+        public Tree(int ID, Vector2 position, int state, string textureName = "Tree")
+            : base(textureName, ID, position)
+        {
+            base.State = state;
+            base.Type = EntityType.Tree;
+        }
+
         public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
             base.Update(gameTime);
@@ -34,6 +42,7 @@ namespace LagomRealism.Enteties
             if (++base.numHits >= 3)
             {
                 base.State = 1;
+                base.Hit();
             }
         }
     }
