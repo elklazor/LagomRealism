@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using LagomRealism.Enteties;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Input;
 namespace LagomRealism
 {
     class GameClient: IFocusable
@@ -17,14 +18,15 @@ namespace LagomRealism
         NetClient client;
         private bool worldGenerated = false;
         private string config;
-      
-        
+
+        Texture2D BorderTexture;
         private int ID;
         GraphicsDevice graphics;
         Point worldSize;
         private bool receivedSeed = false;
         public Player thisPlayer;
         SpriteFont sf;
+        private bool drawBoxes;
 
         public GameClient(GraphicsDevice gd)
         {
@@ -43,7 +45,8 @@ namespace LagomRealism
             }
             
            // client.DiscoverLocalPeers(14242);
-        
+            BorderTexture = new Texture2D(this.graphics, 1, 1, false,SurfaceFormat.Color);
+            BorderTexture.SetData(new[] { Color.White });
         }
 
         public void Update(GameTime gameTime)
@@ -73,15 +76,17 @@ namespace LagomRealism
                                 {
                                     int id = msg.ReadInt32();
                                     int type = msg.ReadInt32();
+                                    int state = msg.ReadInt32();
                                     int x = msg.ReadInt32();
                                     float y = msg.ReadFloat();
+                                    
                                     switch ((EntityType)type)
                                     {
                                         case EntityType.Tree:
                                             World.Entities.Add(new Tree(id,new Vector2(x,y)));
                                             break;
                                         case EntityType.Rock:
-                                            World.Entities.Add(new Rock(id, new Vector2(x, y)));
+                                            World.Entities.Add(new Rock(id, new Vector2(x, y),state));
                                             break;
                                         default:
                                             break;
@@ -175,15 +180,16 @@ namespace LagomRealism
                     client.SendMessage(message, NetDeliveryMethod.Unreliable);    //Send unreliable
                     World.Entities[0].NeedUpdate = false;
 
-                    foreach (var locEnt in World.Entities.Where(le => le.NeedUpdate = true))
-                    {
-                        NetOutgoingMessage entityMessage = client.CreateMessage();
-                        entityMessage.Write((int)MessageType.EntityUpdate);
-                        entityMessage.Write(locEnt.ID);
-                        entityMessage.Write(locEnt.State);
-                        client.SendMessage(entityMessage, NetDeliveryMethod.Unreliable);
-                        locEnt.NeedUpdate = false;
-                    }
+                    
+                }
+                foreach (var locEnt in World.Entities.Where(le => le.NeedUpdate == true))
+                {
+                    NetOutgoingMessage entityMessage = client.CreateMessage();
+                    entityMessage.Write((int)MessageType.EntityUpdate);
+                    entityMessage.Write(locEnt.ID);
+                    entityMessage.Write(locEnt.State);
+                    client.SendMessage(entityMessage, NetDeliveryMethod.Unreliable);
+                    locEnt.NeedUpdate = false;
                 }
             }
             else if(receivedSeed)
@@ -195,6 +201,18 @@ namespace LagomRealism
                 thisPlayer.IsLocal = true;
                 World.Players.Add(thisPlayer);
             }
+
+            ControlInput();
+        }
+
+        private void ControlInput()
+        {
+            if (Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.H))
+            {
+                drawBoxes = true;
+            }
+            else
+                drawBoxes = false;
         }
         
         public void Draw(SpriteBatch SB)
@@ -202,11 +220,15 @@ namespace LagomRealism
             if (worldGenerated)
             {
                 World.Draw(SB);
+
                 
                 foreach (IGameObject ent in World.AllWorldEntities)
                 {
                     ent.Draw(SB);
-                }
+                    if(drawBoxes)
+                        DrawBorder(ent.HitBox, 1, Color.Red, SB);
+                } 
+                
             }
         }
         public void Load(ContentManager content)
@@ -234,6 +256,26 @@ namespace LagomRealism
                 else
                     return Vector2.Zero;
             }
+        }
+
+        private void DrawBorder(Rectangle rectangleToDraw, int thicknessOfBorder, Color borderColor,SpriteBatch spriteBatch)
+        {
+            // Draw top line
+            spriteBatch.Draw(BorderTexture, new Rectangle(rectangleToDraw.X, rectangleToDraw.Y, rectangleToDraw.Width, thicknessOfBorder), borderColor);
+
+            // Draw left line
+            spriteBatch.Draw(BorderTexture, new Rectangle(rectangleToDraw.X, rectangleToDraw.Y, thicknessOfBorder, rectangleToDraw.Height), borderColor);
+
+            // Draw right line
+            spriteBatch.Draw(BorderTexture, new Rectangle((rectangleToDraw.X + rectangleToDraw.Width - thicknessOfBorder),
+                                            rectangleToDraw.Y,
+                                            thicknessOfBorder,
+                                            rectangleToDraw.Height), borderColor);
+            // Draw bottom line
+            spriteBatch.Draw(BorderTexture, new Rectangle(rectangleToDraw.X,
+                                            rectangleToDraw.Y + rectangleToDraw.Height - thicknessOfBorder,
+                                            rectangleToDraw.Width,
+                                            thicknessOfBorder), borderColor);
         }
     }
 }

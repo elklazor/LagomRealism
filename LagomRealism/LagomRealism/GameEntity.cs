@@ -17,7 +17,7 @@ namespace LagomRealism
         public bool NeedUpdate { get; set; }
         public virtual Rectangle HitBox
         {
-            get { return new Rectangle((int)Position.X, (int)Position.Y, texture.Width, texture.Height); }
+            get { return new Rectangle((int)Position.X - texture.Width / 2, (int)Position.Y - texture.Height, texture.Width, texture.Height); }
         }
         public int ID
         {
@@ -37,15 +37,8 @@ namespace LagomRealism
         internal int State
         {
             get { return state; }
-            set 
-            {
-                if (state != value)
-                {
-                    state = value;
-                    NeedUpdate = true;
-                } 
-            
-            }
+            set
+            { state = value; }
         }
         public GameEntity(string textureName, int Id,Vector2 position)
         {
@@ -69,7 +62,7 @@ namespace LagomRealism
 
         public virtual void Hit()
         {
-            numHits++;
+            NeedUpdate = true;
         }
 
         
