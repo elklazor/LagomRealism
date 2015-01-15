@@ -7,13 +7,18 @@ using System.Text;
 
 namespace LagomRealism
 {
-    abstract class GameEntity
+    abstract class GameEntity: IGameObject
     {
         private int id;
         protected Texture2D texture;
         public Vector2 Position { get; set; }
         protected int numHits = 0;
         public Rectangle CollisionRectangle;
+        public bool NeedUpdate { get; set; }
+        public virtual Rectangle HitBox
+        {
+            get { return new Rectangle((int)Position.X - texture.Width / 2, (int)Position.Y - texture.Height, texture.Width, texture.Height); }
+        }
         public int ID
         {
             get { return id; }
@@ -27,12 +32,13 @@ namespace LagomRealism
             set { type = value; }
         }
                 
-        private EntityState state;
+        private int state;
 
-        internal EntityState State
+        internal int State
         {
             get { return state; }
-            set { state = value; }
+            set
+            { state = value; }
         }
         public GameEntity(string textureName, int Id,Vector2 position)
         {
@@ -45,18 +51,20 @@ namespace LagomRealism
 
         public virtual void Update(GameTime gameTime)
         { 
-        
+            
         }
 
         public virtual void Draw(SpriteBatch sb)
         {
-            sb.Draw(texture, new Vector2(Position.X - texture.Width / 2,Position.Y - texture.Height / 2), Color.White);
+            //sb.Draw(texture, new Vector2(Position.X - texture.Width / 2,Position.Y - texture.Height / 2), Color.White);
+            sb.DrawString(TextureManager.StandardGameFont, ID.ToString(), Position, Color.Yellow);
         }
 
         public virtual void Hit()
-        { 
-            //Is called by player
-            numHits++;
+        {
+            NeedUpdate = true;
         }
+
+        
     }
 }

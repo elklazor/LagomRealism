@@ -31,7 +31,7 @@ namespace LagomRealism
     }
     enum AnimationState
     { 
-        None = 0,One,Two,Three,Four
+         One = 0,Two,Three,Four
     }
     public static class TextureContent
     {
@@ -42,7 +42,7 @@ namespace LagomRealism
                 throw new DirectoryNotFoundException();
             Dictionary<String, T> result = new Dictionary<String, T>();
 
-            FileInfo[] files = dir.GetFiles("*.*");
+            FileInfo[] files = dir.GetFiles("*.png*");
             foreach (FileInfo file in files)
             {
                 string key = Path.GetFileNameWithoutExtension(file.Name);

@@ -10,11 +10,11 @@ namespace LagomRealism
     static class TextureManager
     {
         public static Dictionary<string, Texture2D> TextureCache = new Dictionary<string, Texture2D>();
-
+        public static SpriteFont StandardGameFont;
         public static void Load(ContentManager content)
         {
             TextureCache = content.LoadListContent<Texture2D>("Textures");
-            
+            StandardGameFont = content.Load<SpriteFont>("sFont");
         }
 
     }

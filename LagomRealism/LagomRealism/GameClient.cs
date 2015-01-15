@@ -10,22 +10,23 @@ using Microsoft.Xna.Framework.Graphics;
 using LagomRealism.Enteties;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Input;
 namespace LagomRealism
 {
-    class GameClient: IFocusable
+    class GameClient: IFocusable, IDisposable
     {
         NetClient client;
         private bool worldGenerated = false;
         private string config;
-        List<GameEntity> entities = new List<GameEntity>();
-        List<Player> players = new List<Player>();
+
+        Texture2D BorderTexture;
         private int ID;
-        World world;
         GraphicsDevice graphics;
         Point worldSize;
         private bool receivedSeed = false;
         public Player thisPlayer;
         SpriteFont sf;
+        private bool drawBoxes;
 
         public GameClient(GraphicsDevice gd)
         {
@@ -44,7 +45,8 @@ namespace LagomRealism
             }
             
            // client.DiscoverLocalPeers(14242);
-        
+            BorderTexture = new Texture2D(this.graphics, 1, 1, false,SurfaceFormat.Color);
+            BorderTexture.SetData(new[] { Color.White });
         }
 
         public void Update(GameTime gameTime)
@@ -72,18 +74,19 @@ namespace LagomRealism
                                 bool fullEntity = msg.ReadBoolean();
                                 if (fullEntity)
                                 {
-
                                     int id = msg.ReadInt32();
                                     int type = msg.ReadInt32();
+                                    int state = msg.ReadInt32();
                                     int x = msg.ReadInt32();
                                     float y = msg.ReadFloat();
+                                    
                                     switch ((EntityType)type)
                                     {
                                         case EntityType.Tree:
-                                            entities.Add(new Tree(id,new Vector2(x,y)));
+                                            World.Entities.Add(new Tree(id,new Vector2(x,y)));
                                             break;
                                         case EntityType.Rock:
-                                            entities.Add(new Rock(id, new Vector2(x, y)));
+                                            World.Entities.Add(new Rock(id, new Vector2(x, y),state));
                                             break;
                                         default:
                                             break;
@@ -92,7 +95,13 @@ namespace LagomRealism
                                 else
                                 {
                                     int id = msg.ReadInt32();
-                                    entities.First(b => b.ID == id).State = (EntityState)msg.ReadInt32();
+                                    int state = msg.ReadInt32();
+                                    try
+                                    {
+                                        World.Entities.First(b => b.ID == id).State = state;
+                                    }
+                                    catch (Exception)
+                                    { }
                                 }
                                 break;
                             case MessageType.ClientPosition:
@@ -101,23 +110,37 @@ namespace LagomRealism
                                 bool connected = msg.ReadBoolean();
                                 AnimationState aS = (AnimationState)msg.ReadInt32();
                                 bool flip = msg.ReadBoolean();
+                                Vector2 wepPos = msg.ReadVector2();
+                                float wepRot = msg.ReadFloat();
+                                bool isIdle = msg.ReadBoolean();
+
                                 if (worldGenerated)
                                 {
                                     if (!connected)
                                     {
-                                        players.Remove(players.First(var => var.ID == Id));
-                                        break;
+                                        try
+                                        {
+                                            World.Players.Remove(World.Players.First(var => var.ID == Id));
+                                        }
+                                        catch (Exception)
+                                        { 
+                                        
+                                        }
+                                            break;
                                     }
                                     try
                                     {
-                                        Player p = players.First(a => a.ID == Id);
+                                        Player p = World.Players.First(a => a.ID == Id);
                                         p.Position = vec;
                                         p.AnimState = aS;
+                                        p.Weapon.Rotation = wepRot;
+                                        p.Weapon.Position = wepPos;
+                                        p.IsIdle = isIdle;
                                         p.Effect = (flip) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
                                     }
                                     catch (Exception)
                                     {
-                                        players.Add(new Player(world.HeightMap, Id));
+                                        World.Players.Add(new Player(Id));
                                     }
                                     
                                 }
@@ -138,44 +161,75 @@ namespace LagomRealism
             //If the world isn't generated, generate it and dont do any update logic
             if (worldGenerated)
             {
-                players[0].Update(gameTime);
-                if (players[0].NeedUpdate)
+                //players[0].Update(gameTime);
+                foreach (Player player in World.Players)
+                {
+                    player.Update(gameTime);
+                }
+                if (thisPlayer.NeedUpdate)
                 {
                     NetOutgoingMessage message = client.CreateMessage();
                     message.Write((int)MessageType.ClientPosition); 
                     message.Write(ID);                                            //Player ID
-                    message.Write(players[0].Position);                           //Position
-                    message.Write((int)players[0].AnimState);                     //Animation state
-                    message.Write((players[0].Effect == SpriteEffects.None));     //Texture flip?
-                    client.SendMessage(message, NetDeliveryMethod.Unreliable);
-                    players[0].NeedUpdate = false;
+                    message.Write(thisPlayer.Position);                           //Position
+                    message.Write((int)thisPlayer.AnimState);                     //Animation state
+                    message.Write((thisPlayer.Effect == SpriteEffects.None));     //Texture flip?
+                    message.Write(thisPlayer.Weapon.Position);                    //Weaponposition
+                    message.Write(thisPlayer.Weapon.Rotation);                    //Weaponrotation
+                    message.Write(thisPlayer.IsIdle);                             //Is player idle?
+                    client.SendMessage(message, NetDeliveryMethod.Unreliable);    //Send unreliable
+                    thisPlayer.NeedUpdate = false;
+
+                }
+               
+                List<GameEntity> entitiesNeedUpdate = World.Entities.Where(le => le.NeedUpdate).ToList();
+                foreach (var locEnt in entitiesNeedUpdate)
+                {
+                    NetOutgoingMessage entityMessage = client.CreateMessage();
+                    entityMessage.Write((int)MessageType.EntityUpdate);
+                    entityMessage.Write(locEnt.ID);
+                    entityMessage.Write(locEnt.State);
+                    client.SendMessage(entityMessage, NetDeliveryMethod.Unreliable);
+                    locEnt.NeedUpdate = false;
                 }
             }
             else if(receivedSeed)
             { 
-                world = new World();
-                world.StringLoad(config,graphics);
+                
+                World.StringLoad(config,graphics);
                 worldGenerated = true;
-                thisPlayer = new Player(world.HeightMap, ID);
-                players.Add(thisPlayer);
+                thisPlayer = new Player(ID);
+                thisPlayer.IsLocal = true;
+                World.Players.Add(thisPlayer);
             }
+
+            ControlInput();
+        }
+
+        private void ControlInput()
+        {
+            if (Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.H))
+            {
+                drawBoxes = true;
+            }
+            else
+                drawBoxes = false;
         }
         
         public void Draw(SpriteBatch SB)
         {
             if (worldGenerated)
             {
-                world.Draw(SB);
+                World.Draw(SB);
+
                 
-                foreach (GameEntity ent in entities)
+                foreach (IGameObject ent in World.AllWorldEntities)
                 {
                     ent.Draw(SB);
-                }
-                foreach (Player player in players)
-                {
-                    player.Draw(SB);
-                }
-                //SB.DrawString(sf, players[0].Velocity.Y.ToString("f3"), players[0].Position, Color.Tomato);
+                    if(drawBoxes)
+                        DrawBorder(ent.HitBox, 1, Color.Red, SB);
+                } 
+                
             }
         }
         public void Load(ContentManager content)
@@ -203,6 +257,31 @@ namespace LagomRealism
                 else
                     return Vector2.Zero;
             }
+        }
+
+        private void DrawBorder(Rectangle rectangleToDraw, int thicknessOfBorder, Color borderColor,SpriteBatch spriteBatch)
+        {
+            // Draw top line
+            spriteBatch.Draw(BorderTexture, new Rectangle(rectangleToDraw.X, rectangleToDraw.Y, rectangleToDraw.Width, thicknessOfBorder), borderColor);
+
+            // Draw left line
+            spriteBatch.Draw(BorderTexture, new Rectangle(rectangleToDraw.X, rectangleToDraw.Y, thicknessOfBorder, rectangleToDraw.Height), borderColor);
+
+            // Draw right line
+            spriteBatch.Draw(BorderTexture, new Rectangle((rectangleToDraw.X + rectangleToDraw.Width - thicknessOfBorder),
+                                            rectangleToDraw.Y,
+                                            thicknessOfBorder,
+                                            rectangleToDraw.Height), borderColor);
+            // Draw bottom line
+            spriteBatch.Draw(BorderTexture, new Rectangle(rectangleToDraw.X,
+                                            rectangleToDraw.Y + rectangleToDraw.Height - thicknessOfBorder,
+                                            rectangleToDraw.Width,
+                                            thicknessOfBorder), borderColor);
+        }
+
+        public void Dispose()
+        {
+            BorderTexture.Dispose();
         }
     }
 }
